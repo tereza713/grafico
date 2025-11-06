@@ -12,8 +12,8 @@ if (isset($_POST['salvar'])){
         $stmt = $conn->prepare("INSERT INTO precos (ano, cesta_basica, dolar, gasolina) VALUES (?, ?, ?, ?)");
         $stmt->execute([$ano, $cesta, $dolar, $gasolina]);
     } else{
-        $stmt = $conn->prepare("UPDATE precos SET ano=? =, cesta_basica=?, dolar=?, gasolina=? WHERE id=?");
-        $stmt = $conn->execute([$ano, $cesta, $dolar, $gasolina]);
+        $stmt = $conn->prepare("UPDATE precos SET ano=?, cesta_basica=?, dolar=?, gasolina=? WHERE id=?");
+        $stmt->execute([$ano, $cesta, $dolar, $gasolina, $id]);
     }
 
     header("Location: index.php");
@@ -37,16 +37,16 @@ if (isset($_GET['editar'])){
     $registros_editar = $stmt->fetch(PDO::FETCH_ASSOC);
 }   
 
-if (isset($POST['atualizar'])){
-    $id = $POST['id'];
-    $ano = $POST['ano'];
-    $cesta = $POST['cesta'];
-    $dolar = $POST['dolar'];
-    $id = $POST['gasolina'];
+if (isset($_POST['atualizar'])) {
+    $id = $_POST['id'];
+    $ano = $_POST['ano'];
+    $gasolina = $_POST['gasolina'];
+    $cesta = $_POST['cesta'];
+    $dolar = $_POST['dolar'];
 
     $stmt = $conn->prepare("UPDATE precos SET ano=?, cesta_basica=?, dolar=?, gasolina=? WHERE id=?");
-    $stmt->execute($ano, $cesta, $dolar, $gasolina, $id);
-    
+    $stmt->execute([$ano, $cesta, $dolar, $gasolina, $id]);
+
     header("Location: index.php");
     exit;
 }
@@ -58,6 +58,7 @@ if (isset($POST['atualizar'])){
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projeto gráfico Anna e Bruna</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <h2><?php echo $registros_editar ? "Editar Registro" : "Inserir Novo Registro";?></h2>
@@ -89,7 +90,7 @@ if (isset($POST['atualizar'])){
         <hr>
 
         <h2>Lista de preços</h2>
-        <a href="">Ver gráfico</a>
+        <a href="grafico.php">Ver gráfico</a>
         <table border="1" cellpadding="8">
             <tr>
                 <th>ID</th>
@@ -108,9 +109,9 @@ foreach ($registros as $row) {
     echo "<tr>";
     echo "<td>" . $row['id'] . "</td>";
     echo "<td>" . $row['ano'] . "</td>";
-    echo "<td>" . $row['cesta_basica'] . "</td>";
-    echo "<td>" . $row['dolar'] . "</td>";
-    echo "<td>" . $row['gasolina'] . "</td>";
+    echo "<td>" . $row['cesta_basica'] . " cestas</td>";
+    echo "<td>US$ " . number_format($row['dolar'], 2, ',', '.') . "</td>";
+    echo "<td>R$ " . number_format($row['gasolina'], 2, ',', '.') . " L</td>";
     echo "<td>";
     echo '<a href="index.php?editar=' . $row['id'] . '">Editar</a> | ';
     echo '<a href="index.php?excluir=' . $row['id'] . '" onclick="return confirm(\'Tem certeza que deseja excluir?\')">Excluir</a>';
